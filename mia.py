@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QFileDialog, QLabel, QVBoxLayout, QWidget
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
+import pydicom
+import numpy as np
 import sys
 
 class MainWindow(QMainWindow):
@@ -41,10 +43,17 @@ class MainWindow(QMainWindow):
 
     def browse_image(self):
         options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)", options=options)
-        
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif *.dcm)", options=options)
+
         if file_path:
-            pixmap = QPixmap(file_path)
+            if file_path.lower().endswith('.dcm'):
+                dicom_file = pydicom.dcmread(file_path)
+                image_data = dicom_file.pixel_array
+                image_data = np.uint8((image_data / image_data.max()) * 255)  # Normalize the data
+                qimage = QImage(image_data, image_data.shape[1], image_data.shape[0], QImage.Format_Grayscale8)
+                pixmap = QPixmap.fromImage(qimage)
+            else:
+                pixmap = QPixmap(file_path)
             self.image_label.setPixmap(pixmap)
             self.image_label.setAlignment(Qt.AlignCenter)
 
