@@ -1,5 +1,6 @@
+
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFileDialog, QMessageBox, QAction
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QAction, QLabel
 from PyQt5.QtGui import QPixmap, QImage
 import pydicom
 import numpy as np
@@ -17,7 +18,7 @@ def add_menu_item(main_window, menu, title, action_function):
     menu.addAction(action_item)
     return action_item
 
-def open_image(main_window, image_type):
+def open_image(main_window, image_type, image_label):
     options = QFileDialog.Options()
     file_path, _ = QFileDialog.getOpenFileName(main_window, f"Open {image_type} Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif *.dcm)", options=options)
     
@@ -31,6 +32,6 @@ def open_image(main_window, image_type):
             pixmap = QPixmap.fromImage(qimage)
         else:
             pixmap = QPixmap(file_path)
-        main_window.image_label.setPixmap(pixmap)
-        main_window.image_label.setAlignment(Qt.AlignCenter)
+        image_label.setPixmap(pixmap)
+        image_label.setAlignment(Qt.AlignCenter)
         main_window.image_dict[file_name] = pixmap
